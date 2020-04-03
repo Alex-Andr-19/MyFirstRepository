@@ -10,7 +10,7 @@ def angle_to(body, cords):
     sin_a = kat / gip
     a = asin(sin_a)
     if body.rect.x <= cords[0]:
-        a += pi / 2
+        a = pi - a
     if body.rect.y >= cords[1]:
         a = -a
     return a

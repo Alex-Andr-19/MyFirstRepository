@@ -20,7 +20,6 @@ run = 1
 
 all_s = pg.sprite.Group()
 fd_gr = pg.sprite.Group()
-crt_gr = pg.sprite.Group()
 crtb_gr = pg.sprite.Group()
 crts_gr = pg.sprite.Group()
 deadb_gr = pg.sprite.Group()
@@ -32,7 +31,6 @@ fd_mas = [Food() for i in range(COUNT_FD)]
 breed_mas = [count_crt]
 
 for i in range(count_crt):
-    crt_gr.add(crt_mas[i].terretory)
     crtb_gr.add(crt_mas[i].body)
     crts_gr.add(crt_mas[i].sens_circ)
     all_s.add(crt_mas[i].terretory)
@@ -42,10 +40,10 @@ for i in range(COUNT_FD):
     fd_gr.add(fd_mas[i].food)
 
 f = pg.font.Font(None, 36)
-index = [fn_nrst_trg(crt_mas[i], crt_mas, fd_mas, crt_gr, deadb_gr, fd_gr) for i in range(count_crt)]
+index = [fn_nrst_trg(crt_mas[i], crt_mas, fd_mas, crtb_gr, deadb_gr, fd_gr) for i in range(count_crt)]
 
 while run:
-    l1 = f.render("Creatures - " + str(len(crt_gr) // 2), 1, (255, 255, 255))
+    l1 = f.render("Creatures - " + str(len(crtb_gr) // 2), 1, (255, 255, 255))
     l2 = f.render("Alive      - " + str(alive), 1, (255, 255, 255))
     l3 = f.render("Food      - " + str(len(fd_gr)), 1, (255, 255, 255))
     l4 = f.render("Days      - " + str(days), 1, (255, 255, 255))
@@ -126,14 +124,14 @@ while run:
 
                 # факт рождения
                 crt_mas.append(Creature(WCR, HCR, SENS, cords, crt_mas[i].breed+1))
-                index.append(fn_nrst_trg(crt_mas[-1], crt_mas, fd_mas, crt_gr, deadb_gr, fd_gr, [index[j] for j in range(count_crt) if j != i]))
+                index.append(fn_nrst_trg(crt_mas[-1], crt_mas, fd_mas, crtb_gr, deadb_gr, fd_gr, [index[j] for j in range(count_crt) if j != i]))
 
                 crt_mas[-1].energy = crt_mas[i].birth_enr / 1.5
                 crt_mas[-1].birth_enr = crt_mas[i].birth_enr
                 crt_mas[-1].speed = crt_mas[i].speed
                 crt_mas[-1].color2 = crt_mas[i].color2
 
-                crt_gr.add(crt_mas[-1].terretory)
+#                crt_gr.add(crt_mas[-1].terretory)
                 crtb_gr.add(crt_mas[-1].body)
                 crts_gr.add(crt_mas[-1].sens_circ)
                 all_s.add(crt_mas[-1].terretory)
@@ -181,14 +179,14 @@ while run:
     for i in range(count_crt):
         if index[i] < len(fd_mas):
             if fd_mas[index[i]].food not in fd_gr and index[i] != -1:
-               index[i] = fn_nrst_trg(crt_mas[i], crt_mas, fd_mas, crt_gr, deadb_gr, fd_gr,
+               index[i] = fn_nrst_trg(crt_mas[i], crt_mas, fd_mas, crtb_gr, deadb_gr, fd_gr,
                                       [index[j] for j in range(count_crt) if j != i])
-        elif crt_mas[clamp(index[i] - len(fd_mas), len(crt_mas) - 1)].body not in crt_gr:
-            index[i] = fn_nrst_trg(crt_mas[i], crt_mas, fd_mas, crt_gr, deadb_gr, fd_gr,
+        elif crt_mas[clamp(index[i] - len(fd_mas), len(crt_mas) - 1)].body not in crtb_gr:
+            index[i] = fn_nrst_trg(crt_mas[i], crt_mas, fd_mas, crtb_gr, deadb_gr, fd_gr,
                                    [index[j] for j in range(count_crt) if j != i])
 
     # генерация нового дня
-    if len(fd_gr) < COUNT_FD // 10:
+    if len(fd_gr) < COUNT_FD // 100 * 5:
         # генерация нового поля еды
         for i in range(COUNT_FD - len(fd_gr)):
             fd_mas[i].food.rect.x = rand(WCR, SCR_W - WCR)
@@ -200,19 +198,17 @@ while run:
         # навый подсчет целей-еды для каждой живой особи (чтобы не бежали все в одну сторону)
         for i in range(count_crt):
             if index[i] >= 0:
-                index[i] = fn_nrst_trg(crt_mas[i], crt_mas, fd_mas, crt_gr, deadb_gr, fd_gr)
+                index[i] = fn_nrst_trg(crt_mas[i], crt_mas, fd_mas, crtb_gr, deadb_gr, fd_gr)
             crt_mas[i].days += 1
 
         # очистка "памяти" от съеденных особей
-        index = [index[i] for i in range(count_crt) if crt_mas[i].body in crt_gr]
-        crt_mas = [crt_mas[i] for i in range(count_crt) if crt_mas[i].body in crt_gr]
+        index = [index[i] for i in range(count_crt) if crt_mas[i].body in crtb_gr]
+        crt_mas = [crt_mas[i] for i in range(count_crt) if crt_mas[i].body in crtb_gr]
         count_crt = len(crt_mas)
 
         # обновление дня
         days += 1
         aver_days = 0
-        # if days > 5:
-            # COUNT_FD = clamp(COUNT_FD - 25, 5000, 500)
 
     '''keys = pg.key.get_pressed()
     if keys[pg.K_RIGHT] and crt_mas[0].body.rect.x + 20 < 495:

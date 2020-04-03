@@ -15,8 +15,7 @@ class Creature:
         self.breed = breed
         self.days = 1
 
-        self.center = (0, 0)
-        self.angle = 0
+
 
         self.terretory = pg.sprite.Group()
 
@@ -46,6 +45,9 @@ class Creature:
                        color2,
                        (sens, sens),
                        sens)
+
+        self.center = (self.body.rect.x - self.sens, self.body.rect.y)
+        self.angle = 0
 
         self.energy = 2.5
         self.speed = 1
@@ -116,11 +118,11 @@ class Creature:
             return 0
         return 1
 
-    def just_walk(self):
-        angle_tmp = self.angle + pi / 90
+    def just_walk(self, start_w):
+        for i in range(self.speed):
+            self.angle += pi / 90
+            self.body.rect.x = self.center[0] + self.sens * cos(self.angle)
+            self.body.rect.y = self.center[1] - self.sens * sin(self.angle)
+            self.sens_circ.rect.x = self.body.rect.x - self.sens + self.w // 2
+            self.sens_circ.rect.y = self.body.rect.y - self.sens + self.h // 2
 
-        self.body.rect.x = self.center[0] + self.sens * cos(angle_tmp)
-        self.body.rect.y = self.center[1] - self.sens * sin(angle_tmp)
-        self.sens_circ.rect.x = self.body.rect.x - self.sens + self.w // 2
-        self.sens_circ.rect.y = self.body.rect.y - self.sens + self.h // 2
-        self.angle += pi / 90
